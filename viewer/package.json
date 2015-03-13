@@ -1,0 +1,36 @@
+{
+  "name": "react-sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "jsx src/ compiled-js/src/ & jsx test/ compiled-js/test/",
+    "test": "mocha compiled-js/test --harmony",
+    "prestart": "gulp js",
+    "start": "node server",
+    "build": "gulp js",
+    "watch": "gulp watch",
+    "gulp": "gulp"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "director": "^1.2.7",
+    "ecstatic": "^0.6.1",
+    "http-server": "^0.7.4",
+    "object-assign": "^2.0.0",
+    "react": "^0.13.0"
+  },
+  "devDependencies": {
+    "browserify": "^8.0.2",
+    "gulp": "^3.8.10",
+    "gulp-connect": "^2.2.0",
+    "jsdom": "^4.0.1",
+    "mocha": "^2.1.0",
+    "react-tools": "^0.12.2",
+    "reactify": "^0.17.1",
+    "should": "^5.0.1",
+    "sinon": "^1.12.2",
+    "vinyl-source-stream": "^1.0.0"
+  }
+}

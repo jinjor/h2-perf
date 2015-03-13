@@ -1,0 +1,158 @@
+body {
+  font-family: Verdana, "游ゴシック", YuGothic, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;  
+}
+ul {
+  list-style-type: none;
+}
+.menu {
+  margin-bottom: 15px;
+}
+.condition {
+  height: 170px;
+  margin: 20px 0;
+  border: solid 1px #eee;
+  padding: 10px;
+}
+.condition__var__label {
+  display: inline-block;
+  width: 100px;
+}
+.condition__var {
+  margin: 6px 0;
+  display: flex;
+}
+.condition__var__option {
+  margin: 0 2px;
+}
+.condition__var__option input[type=radio] {
+  display:none;
+}
+.condition__var__option input[type=radio] + label {
+  background-color: #ddd;
+  cursor: pointer;
+  padding: 4px 8px;
+  display: inline-block;
+}
+.condition__var__option input[type=radio]:checked + label {
+  background-color: #b9d;
+}
+.condition__var_index .condition__var__option input[type=radio]:checked + label {
+  background-color: #d9b;
+}
+.resource_viewer {
+  position: relative;
+}
+.resource_viewer ul {
+  padding-left: 0;
+}
+.resource {
+  height: 12px;
+  font-size: 11px;
+  margin-bottom: 1px;
+}
+.resource__name {
+  display: inline-block;
+  width: 100px;
+  text-align: right;
+  vertical-align: top;
+}
+.resource__bar_container {
+  display: inline-block;
+  position: relative;
+  height: 12px;
+  background-color: rgba(256,256,256,0.6);
+  width: 600px;
+  overflow: hidden;
+}
+.resource__header {
+  position: absolute;
+  top: 0;
+  left: 100px;
+  width: 600px;
+  background-color: #ddd;
+}
+.resource__axis {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background-color: #fff;
+}
+.resource__axis_last_resend {
+  color: #d55;
+  background-color: #d55;
+  z-index: 1000;
+}
+.resource__axis_last_resend:after {
+  position: relative;
+  top: -20px;
+  left: -15px;
+  content: attr(data-time);
+}
+.resource__bar {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+}
+.resource__bar_con_to_req {
+  background-color: #cde;
+}
+.resource__bar_req_to_res {
+  background-color: #6aa;
+}
+.resource__bar_res_to_resend {
+  background-color: #588;
+}
+.resource__bar_domload_to_dominteractive {
+  background-color: #db8;
+}
+.resource__bar_dominteractive_to_domcomplete {
+  background-color: #daa;
+}
+.comparison {
+  margin: 30px 0px;
+  padding-bottom: 10px;
+}
+.comparison__head {
+  background-color: #eee;
+  padding: 5px;
+}
+.server_comparison {
+  display: flex;
+  margin: 20px 0px;
+}
+.server_comparison__head {
+  width: 200px;
+  line-height: 40px;
+  text-align: right;
+  padding: 0px 10px;
+}
+.server_comparison__bar {
+  height: 10px;
+  position: relative;
+}
+.server_comparison__bar > span {
+  position: absolute;
+  font-size: 10px;
+  top: -1.5px;
+  right: -35px;
+  content: attr(data-time);
+}
+.server_comparison__bar_0 {
+  background-color: #46b;
+}
+.server_comparison__bar_1 {
+  background-color: #4a9;
+}
+.server_comparison__bar_2 {
+  background-color: #a6c;
+}
+.server_comparison__bar_3 {
+  background-color: #9c4;
+}
+.server_comparison__bar_4 {
+  background-color: #c49;
+}
+.server_comparison__bar_5 {
+  background-color: #c94;
+}
