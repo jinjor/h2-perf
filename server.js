@@ -24,6 +24,8 @@ var PUSH_OPT = 128;
 var results = [];
 var casesIndex = 0;
 
+var debugMode = process.argv[2];
+
 console.log('Executing ' + allVariation.length + ' cases...');
 
 function createURL(nextCase) {
