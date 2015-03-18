@@ -376,7 +376,7 @@ for (var i = 0; i < times; i++) {
   indexVariation.push(i);
 }
 var resourceVariation = ['js', 'image', 'many-js', 'many-image', 'many-js-concat', 'many-image-sprite'];
-var serverVariation = ['1', '1s', '2', '2p', '2+1', /*'2p+1'*/ ];
+var serverVariation = ['1', '1s', '2', '2p', '2p*', '2+1'/*, '2p+1'*/];
 var delayVariation = [0, 10];
 var proxyDelayVariation = [0, 10];
 
@@ -420,6 +420,7 @@ module.exports = {
   proxyDelayVariation: proxyDelayVariation,
   allVariation: allVariation
 };
+
 },{"assert":7}],3:[function(require,module,exports){
 'use strict';
 
