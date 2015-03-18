@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "pretest": "jsx src/ compiled-js/src/ & jsx test/ compiled-js/test/",
+    "pretest": "jsx src/ compiled-js/src/ && jsx test/ compiled-js/test/",
     "test": "mocha compiled-js/test --harmony",
     "prestart": "gulp js",
     "start": "node server",
