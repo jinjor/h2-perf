@@ -229,7 +229,7 @@ function run(host) {
 module.exports = function(host, cb) {
   run(host);
   setTimeout(function() {
-    var firstUrl = createURL(allVariation[0]);
+    var firstUrl = createURL(allVariation[0], host);
     console.log('first URL is ' + firstUrl);
     cb && cb(firstUrl);
   }, 1000);
