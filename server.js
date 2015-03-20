@@ -174,7 +174,7 @@ function run(host) {
       '/many-image.html': (function() {
         var list = ['app.js'];
         for (var i = 1; i <= 6; i++) {
-          for (var j = 0; j < 6; j++) {
+          for (var j = 0; j < 10; j++) {
             var alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'][j];
             var name = '/images/image' + i + alpha + '.png';
             list.push(name);
