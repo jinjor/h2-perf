@@ -16,6 +16,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "postinstall": "cd viewer && npm install",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index",
     "server": "node server-only",
