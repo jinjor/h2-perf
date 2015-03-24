@@ -16,7 +16,7 @@ var allVariation = (function() {
     resourceVariation.forEach(function(resource) {
       serverVariation.forEach(function(server) {
 
-        var _delayVariation = server.indexOf('h2o') ? [0] : delayVariation;
+        var _delayVariation = server.indexOf('h2o') >= 0 ? [0] : delayVariation;
 
         _delayVariation.forEach(function(delay) {
           if (server.indexOf('+') >= 0) {
