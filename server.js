@@ -32,18 +32,20 @@ function createURL(nextCase, host) {
   host = host || 'localhost';
   console.log(nextCase);
   var port = 8000;
-  var schema = (nextCase.server[0] === '2' || nextCase.server === '1s') ? 'https' : 'http';
+  var schema = (nextCase.server[0] === '2' || nextCase.server === '1s' || nextCase.server === 'h2o-secure') ? 'https' : 'http';
   if (nextCase.server === 'h2o-plain') port = 7000;
   else if (nextCase.server === 'h2o-secure') port = 7001;
-  else if (nextCase.server === '1s') port += H1S;
-  else if (nextCase.server === '2') port += H2;
-  else if (nextCase.server === '2p') port += H2 + PUSH;
-  else if (nextCase.server === '2p*') port += H2 + PUSH + PUSH_OPT;
-  else if (nextCase.server === '2+1') port += H1PROXY;
-  else if (nextCase.server === '2p+1') port += H1PROXY + PUSH;
+  else {
+    if (nextCase.server === '1s') port += H1S;
+    else if (nextCase.server === '2') port += H2;
+    else if (nextCase.server === '2p') port += H2 + PUSH;
+    else if (nextCase.server === '2p*') port += H2 + PUSH + PUSH_OPT;
+    else if (nextCase.server === '2+1') port += H1PROXY;
+    else if (nextCase.server === '2p+1') port += H1PROXY + PUSH;
 
-  if (nextCase.delay) port += DELAY;
-  if (nextCase.proxyDelay) port += PROXY_DELAY;
+    if (nextCase.delay) port += DELAY;
+    if (nextCase.proxyDelay) port += PROXY_DELAY;  
+  }
   var resource = nextCase.resource;
   return schema + '://' + host + ':' + port + '/' + resource + '.html';
 }
