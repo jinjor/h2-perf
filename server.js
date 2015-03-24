@@ -24,7 +24,6 @@ var PUSH_OPT = 128;
 var results = [];
 var casesIndex = 0;
 
-var debugMode = false;
 
 console.log('Executing ' + allVariation.length + ' cases...');
 
@@ -44,7 +43,7 @@ function createURL(nextCase, host) {
     else if (nextCase.server === '2p+1') port += H1PROXY + PUSH;
 
     if (nextCase.delay) port += DELAY;
-    if (nextCase.proxyDelay) port += PROXY_DELAY;  
+    if (nextCase.proxyDelay) port += PROXY_DELAY;
   }
   var resource = nextCase.resource;
   return schema + '://' + host + ':' + port + '/' + resource + '.html';
@@ -59,7 +58,8 @@ function onResult(res, result, host) {
   casesIndex++;
   var nextCase = allVariation[casesIndex];
   if (!nextCase || currentCase.index !== nextCase.index) {
-    debugMode || fs.writeFile('results/' + currentCase.index + '.json', JSON.stringify(results), function() {
+    fs.writeFile('results/' + currentCase.index + '.json', JSON.stringify(results), function(err) {
+      console.log(err);
       if (!nextCase) {
         process.exit(0);
       }
@@ -223,7 +223,6 @@ function run(host) {
 
 
   https.createServer(options, function(req, res) {
-    console.log('req');
     var args = arguments;
     if (req.url === '/result') {
       res.setHeader("Access-Control-Allow-Origin", "*");
