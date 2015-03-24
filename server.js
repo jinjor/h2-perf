@@ -33,7 +33,9 @@ function createURL(nextCase, host) {
   console.log(nextCase);
   var port = 8000;
   var schema = (nextCase.server[0] === '2' || nextCase.server === '1s') ? 'https' : 'http';
-  if (nextCase.server === '1s') port += H1S;
+  if (nextCase.server === 'h2o-plain') port = 7000;
+  else if (nextCase.server === 'h2o-secure') port = 7001;
+  else if (nextCase.server === '1s') port += H1S;
   else if (nextCase.server === '2') port += H2;
   else if (nextCase.server === '2p') port += H2 + PUSH;
   else if (nextCase.server === '2p*') port += H2 + PUSH + PUSH_OPT;
@@ -82,7 +84,7 @@ function result(middleware, host) {
       });
       return;
     }
-    middleware.apply(this, args);
+    middleware && middleware.apply(this, args);
   };
 }
 
@@ -92,14 +94,6 @@ process.on('uncaughtException', function(err) {
 });
 
 function run(host) {
-  function cors(middleware, delay) {
-    return function(req, res) {
-      var args = arguments;
-      res.setHeader("Access-Control-Allow-Origin", "localhost:9000");
-      res.setHeader("Access-Control-Allow-Headers", "*");
-      middleware.apply(this, args);
-    };
-  }
 
   function forceRefresh(middleware, delay) {
     return function(req, res, next) {
@@ -129,7 +123,7 @@ function run(host) {
      * client |               | proxy |                    |server
      *        | <--(delay)--- |       | <--(proxyDelay)--- |
      */
-    return cors(result(delayed(function(req, res) {
+    return result(delayed(function(req, res) {
       //
       request({
         method: req.method,
@@ -148,7 +142,7 @@ function run(host) {
         });
         res.writeHead(response.statusCode, headers);
       }).pipe(res);
-    }, proxyDelay), host));
+    }, proxyDelay), host);
   }
 
   var options = {
@@ -159,10 +153,10 @@ function run(host) {
   var delay = cases.delayVariation[1];
   var proxyDelay = cases.proxyDelayVariation[1];
 
-  var staticRouter = cors(result(forceRefresh(ecstatic({
+  var staticRouter = result(forceRefresh(ecstatic({
     cache: 0,
     root: __dirname + '/public'
-  })), host));
+  })), host);
   var delayedStaticRouter = delayed(staticRouter, delay);
   var autopushRouter = autoPush(staticRouter);
   var delayedAutopushRouter = delayed(autopushRouter, delay);
@@ -224,6 +218,30 @@ function run(host) {
   http2.createServer(options, autoPush(h1ploxy(proxyDelay, 8000))).listen(8000 + H1PROXY + PUSH + PROXY_DELAY);
   http2.createServer(options, delayed(autoPush(h1ploxy(0, 8000)), delay)).listen(8000 + H1PROXY + PUSH + DELAY);
   http2.createServer(options, delayed(autoPush(h1ploxy(proxyDelay, 8000)), delay)).listen(8000 + H1PROXY + PUSH + DELAY + PROXY_DELAY);
+
+
+  https.createServer(options, function(req, res) {
+    console.log('req');
+    var args = arguments;
+    if (req.url === '/result') {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "X-PINGOTHER");
+      res.setHeader("Access-Control-Max-Age", "1728000");
+      var buffer = new Buffer(0);
+      req.on('data', function(chunk) {
+        buffer = Buffer.concat([buffer, chunk]);
+      });
+      req.on('end', function(chunk) {
+        var result = JSON.parse(buffer.toString());
+        // console.log(result);
+        onResult(res, result, host);
+      });
+      return;
+    }
+
+  }).listen(9000);
 }
 
 module.exports = function(host, cb) {
