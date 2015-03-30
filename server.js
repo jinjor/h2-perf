@@ -188,6 +188,7 @@ function run(host) {
       })(),
       '/many-image-sprite.html': ['/app.js', '/images/all.png'],
       '/many-js-concat.html': ['/app.js', '/js/all.js'],
+      '/css-image.html': ['/app.js', '/style.css', '/images/image1a.png'],
     }
   }
 

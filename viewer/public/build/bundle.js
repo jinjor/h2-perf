@@ -375,8 +375,8 @@ var indexVariation = [];
 for (var i = 0; i < times; i++) {
   indexVariation.push(i);
 }
-var resourceVariation = [/*'js', 'image', 'many-js', 'many-image', 'many-js-concat', 'many-image-sprite', */'css-image'];
-var serverVariation = ['2', '2p'];//['1', '1s', '2', '2p', '2p*', '2+1'/*, '2p+1', 'h2o-plain', 'h2o-secure'*/];
+var resourceVariation = ['js', 'image', 'many-js', 'many-image', 'many-js-concat', 'many-image-sprite', 'css-image'];
+var serverVariation = ['1', '1s', '2', '2p', '2p*', '2+1'/*, '2p+1'*//*, 'h2o-plain', 'h2o-secure'*/];
 var delayVariation = [0, 10];
 var proxyDelayVariation = [0, 10];
 
