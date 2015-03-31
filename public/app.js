@@ -58,7 +58,7 @@ setTimeout(function() {
   var result = getResult();
 
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', location.origin + ':9000/result', true);
+  xhr.open('POST', location.origin.split(':')[0] + ':9000/result', true);
   xhr.onload = function(e) {
     var nextUrl = this.response;
     if (nextUrl) {
