@@ -12,7 +12,34 @@ function result(middleware) {
     var args = arguments;
     if (req.url.indexOf('/data') === 0) {
       var index = req.url.split('/data/')[1];
-      var path = __dirname + '/../results/' + index + '.json';
+      if (index === 'all') {
+        var cases = fs.readFileSync(__dirname + '/../results/cases.json');
+        cases = JSON.parse(cases);
+        var resultsList = [];
+        cases.indexVariation.forEach(function(index) {
+          var path = __dirname + '/../results/' + index + '.json';
+          var data = JSON.parse(fs.readFileSync(path));
+          resultsList.push(data);
+        });
+        var resultsListStr = JSON.stringify(resultsList);
+        // console.log(resultsListStr);
+        res.writeHead(200, {
+          'Content-Type': 'application/json'
+        });
+        res.end(resultsListStr);
+        return;
+      } else {
+        var path = __dirname + '/../results/' + index + '.json';
+        var stat = fs.statSync(path);
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Content-Length': stat.size
+        });
+        fs.createReadStream(path).pipe(res);
+        return;
+      }
+    } else if (req.url === '/cases') {
+      var path = __dirname + '/../results/cases.json';
       var stat = fs.statSync(path);
       res.writeHead(200, {
         'Content-Type': 'application/json',

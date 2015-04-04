@@ -21,6 +21,7 @@ function getResult() {
   });
   return {
     port: location.port,
+    chromeLoadTimes: window.chrome ? window.chrome.loadTimes() : {},
     performance: {
       navigation: {
         type: window.performance.navigation.type,

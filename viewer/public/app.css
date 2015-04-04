@@ -41,6 +41,7 @@ ul {
 }
 .resource_viewer {
   position: relative;
+  margin-top: 60px;
 }
 .resource_viewer ul {
   padding-left: 0;
@@ -83,11 +84,21 @@ ul {
   background-color: #d55;
   z-index: 1000;
 }
-.resource__axis_last_resend:after {
+.resource__axis_first_paint {
+  color: #6b6;
+  background-color: #6b6;
+  z-index: 1000;
+}
+.resource__axis_timing:after {
   position: relative;
-  top: -20px;
   left: -15px;
   content: attr(data-time);
+}
+.resource__axis_last_resend:after {
+  top: -36px;
+}
+.resource__axis_first_paint:after {
+  top: -20px;
 }
 .resource__bar {
   position: absolute;

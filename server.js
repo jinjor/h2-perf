@@ -1,4 +1,3 @@
-var cases = require('./cases.js');
 var http = require('http');
 var https = require('https');
 var http2 = require('http2');
@@ -9,6 +8,11 @@ var Transform = require('stream').Transform;
 var util = require('util');
 var fs = require('fs');
 var assign = require('object-assign');
+
+var cases = require('./cases.js')({
+  times: 1,
+  h2o: false
+});
 
 var allVariation = cases.allVariation;
 
@@ -26,6 +30,8 @@ var casesIndex = 0;
 
 
 console.log('Executing ' + allVariation.length + ' cases...');
+
+
 
 function createURL(nextCase, host) {
   host = host || 'localhost';
@@ -49,6 +55,12 @@ function createURL(nextCase, host) {
   return schema + '://' + host + ':' + port + '/' + resource + '.html';
 }
 
+function onEnd() {
+  fs.writeFile('results/cases.json', JSON.stringify(cases), function(err) {
+    process.exit(0);
+  });
+}
+
 
 function onResult(res, result, host) {
   var currentCase = allVariation[casesIndex];
@@ -61,7 +73,7 @@ function onResult(res, result, host) {
     fs.writeFile('results/' + currentCase.index + '.json', JSON.stringify(results), function(err) {
       console.log(err);
       if (!nextCase) {
-        process.exit(0);
+        onEnd();
       }
     });
     results = [];

@@ -4,7 +4,6 @@ var assign = require('object-assign');
 var ResultsStorage = require('./storage.js');
 var calc = require('./calc.js');
 var Perf = React.addons.Perf;
-var cases = require('../../cases.js');
 
 function findResult(results, targetCase) {
   var result = null;
@@ -24,6 +23,18 @@ function findResult(results, targetCase) {
 
 var msToPx = 1;
 
+var Timing = React.createClass({
+  render: function() {
+    var time = this.props.time;
+    var style = {
+      left: msToPx * time
+    };
+    var time = Math.round(time) + 'ms';
+    var className = "resource__axis resource__axis_timing " + this.props.className;
+    return <div data-time={time} className={className} style={style}></div>;
+  }
+});
+
 var ResourceHeader = React.createClass({
   render: function() {
     var data = this.props.data;
@@ -34,20 +45,23 @@ var ResourceHeader = React.createClass({
       };
       return <div key={ms} className="resource__axis" style={style}></div>
     });
-    var lastResponseEndTime = (data ? calc.calcLastResponseEnd(data) : 0);
-    var lastResponseEndStyle = {
-      left: msToPx * lastResponseEndTime
-    };
-    var time = Math.round(lastResponseEndTime) + 'ms';
-    var lastResponseEnd = data ? <div data-time={time} className="resource__axis resource__axis_last_resend" style={lastResponseEndStyle}></div> : null;
 
+    var timings = [];
+    if(data) {
+      var lastResponseEndTime = (data ? calc.calcLastResponseEnd(data) : 0);
+      timings.push(<Timing key="resource__axis_last_resend" time={lastResponseEndTime} className="resource__axis_last_resend"/>);
+      if(data.chromeLoadTimes) {
+        var firstPaint = data.chromeLoadTimes.firstPaintTime * 1000 - data.performance.timing.navigationStart;
+        timings.push(<Timing key="resource__axis_first_paint" time={firstPaint} className="resource__axis_first_paint"/>);
+      }
+    }
     var style = {
       height: 13 * length - 1
     };
     return (
     <div className="resource__header" style={style}>
       {axis}
-      {lastResponseEnd}
+      {timings}
     </div>
     );
   }
@@ -56,29 +70,42 @@ var ResourceHeader = React.createClass({
 var MainResource = React.createClass({
   render: function() {
     var data = this.props.data;
+
+    var timing = data.performance.timing;
+    var chromeLoadTimes = data.chromeLoadTimes;
     var name = 'index.html';
-    // Object.keys(data).forEach(function(key) {
-    //   console.log(key + ':' + (data[key] - data.navigationStart));
-    // });
+    Object.keys(timing).forEach(function(key) {
+      console.log(key + ':' + (timing[key] - timing.navigationStart));
+    });
+    if(chromeLoadTimes) {
+      Object.keys(chromeLoadTimes).forEach(function(key) {
+        if(+chromeLoadTimes[key]) {
+          console.log(key + ':' + (+chromeLoadTimes[key] * 1000 - timing.navigationStart));
+        } else {
+          console.log(key + ':' + (chromeLoadTimes[key]));
+        }
+      });
+    }
+    console.log(chromeLoadTimes);
     var conReqStyle = {
-      left: msToPx * data.connectStart - data.navigationStart,
-      width: msToPx * (data.requestStart - data.connectStart)
+      left: msToPx * timing.connectStart - timing.navigationStart,
+      width: msToPx * (timing.requestStart - timing.connectStart)
     };
     var reqResStyle = {
-      left: msToPx * data.requestStart - data.navigationStart,
-      width: msToPx * (data.responseStart - data.requestStart)
+      left: msToPx * timing.requestStart - timing.navigationStart,
+      width: msToPx * (timing.responseStart - timing.requestStart)
     };
     var resResendStyle = {
-      left: msToPx * data.responseStart - data.navigationStart,
-      width: msToPx * (data.responseEnd - data.responseStart)
+      left: msToPx * timing.responseStart - timing.navigationStart,
+      width: msToPx * (timing.responseEnd - timing.responseStart)
     };
     var domLoadDomInteractiveStyle = {
-      left: msToPx * data.domLoading - data.navigationStart,
-      width: msToPx * (data.domInteractive - data.domLoading)
+      left: msToPx * timing.domLoading - timing.navigationStart,
+      width: msToPx * (timing.domInteractive - timing.domLoading)
     };
     var domInteractiveDomCompleteStyle = {
-      left: msToPx * data.domInteractive - data.navigationStart,
-      width: msToPx * (data.domComplete - data.domInteractive)
+      left: msToPx * timing.domInteractive - timing.navigationStart,
+      width: msToPx * (timing.domComplete - timing.domInteractive)
     };
     // resource__header is an exception for simplifying layout
     return (
@@ -148,6 +175,10 @@ var Condition = React.createClass({
     updateHash('waterfall', index, server, resource, delay, proxyDelay);
   },
   render: function() {
+    var cases = this.props.cases;
+    if(!cases) {
+      return null;
+    }
     var query = this.props.query || {
       index: null,
       server: '',
@@ -225,13 +256,14 @@ var Waterfall = React.createClass({
   render: function() {
     var results = this.props.results;
     var query = this.props.query;
-
+    var cases = this.props.cases;
     var result = null;
     if(results && query) {
       var targetCase = query;
       var result = findResult(results, targetCase);
     }
-    var mainResource = result ? <li key="main-resource"><MainResource data={result.performance.timing}/></li> : null;
+
+    var mainResource = result ? <li key="main-resource"><MainResource data={result}/></li> : null;
     var resourcesView = result ? result.resourceList.filter(function(resource) {
       return resource.name.indexOf('result') < 0;
     }).map(function(resource) {
@@ -239,7 +271,7 @@ var Waterfall = React.createClass({
     }) : null;
     return (
       <div>
-        <Condition query={query}/>
+        <Condition cases={cases} query={query}/>
         <div className="resource_viewer">
           <ResourceHeader data={result}/>
           <ul>
@@ -283,13 +315,17 @@ var SereverComparison = React.createClass({
 
 var Comparison = React.createClass({
   render: function() {
+    var cases = this.props.cases;
     var results = this.props.results;
+    if(!cases) {
+      return null;
+    }
     var comparisons = results ? cases.resourceVariation.map(function(resource) {
       var fileteredResults = calc.filterResults(results, {
         resource: resource,
         delay: this.props.delay
       });
-      return <SereverComparison key={resource} resource={resource} results={fileteredResults}/>;
+      return <SereverComparison cases={cases} key={resource} resource={resource} results={fileteredResults}/>;
     }.bind(this)) : null;
     return (
       <div className="comparison">
@@ -310,7 +346,7 @@ var App = React.createClass({
     return {
       page: null,
       query: null,
-      results: null
+      results: null,
     };
   },
   componentDidMount: function() {
@@ -320,13 +356,16 @@ var App = React.createClass({
       var query = assign(this.state.query || {}, parsed.query);
       query.delay = +query.delay;
       query.proxyDelay = +query.proxyDelay;
-      Promise.all([ResultsStorage.get('center'), ResultsStorage.get(query.index)])
-        .then(function(centerResults_results) {
+      Promise.all([ResultsStorage.get('center'), ResultsStorage.get(query.index), ResultsStorage.getCases()])
+        .then(function(resultList) {
+          console.log(resultList[1]);
+
           this.setState({
             page: page,
             query: query,
-            centerResults: centerResults_results[0],
-            results: centerResults_results[1]
+            centerResults: resultList[0],
+            results: resultList[1],
+            cases: resultList[2]
           });
         }.bind(this));
     }.bind(this);
@@ -334,19 +373,23 @@ var App = React.createClass({
     if((location.hash || '').indexOf('?') >= 0) {
       setQuery();
     } else {
-      updateHash('waterfall', 'center', '1', 'many-image', cases.delayVariation[1], 0);
+      updateHash('waterfall', 'center', '1', 'many-image', 10, 0);
     }
   },
   render: function() {
+    var cases = this.state.cases;
     var results = this.state.results;
     var query = this.state.query;
     var page = null;
+    if(!cases) {
+      return null;
+    }
     if(this.state.page === 'waterfall'){
-      page = <Waterfall query={query} results={results}/>;
+      page = <Waterfall query={query} cases={cases} results={results}/>;
     } else if(this.state.page === 'comparison'){
       page = <div>
-        <Comparison delay={0} results={this.state.centerResults}/>
-        <Comparison delay={10} results={this.state.centerResults}/>
+        <Comparison delay={0} cases={cases} results={this.state.centerResults}/>
+        <Comparison delay={10} cases={cases} results={this.state.centerResults}/>
       </div>;
     }
     return (
